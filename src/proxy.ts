@@ -4,7 +4,7 @@ export { default } from "next-auth/middleware";
 
 
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
 
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
     const url = request.nextUrl;
@@ -19,5 +19,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/", "/sign-in ", "/sign-up", "/verify/:path*", "/dashboard/:path*", "/profile/:path*"]
+    matcher: [ "/","/sign-in ", "/sign-up", "/verify/:path*", "/dashboard/:path*", "/profile/:path*"]
 };

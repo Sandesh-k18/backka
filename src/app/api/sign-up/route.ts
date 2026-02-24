@@ -3,38 +3,48 @@ import UserModel from "@/src/model/User";
 import bcrypt from "bcryptjs";
 import { sendVerificationEmail } from "@/src/helpers/sendVerificationEmail";
 
-
 export async function POST(request: Request) {
     await dbConnect();
     try {
         const { email, username, password } = await request.json();
-        const existingUserVerifiedByUsername = await UserModel.findOne({ username, isVerified: true })
+
+        // Check if username is already taken by a VERIFIED user
+        const existingUserVerifiedByUsername = await UserModel.findOne({ username, isVerified: true });
+
         if (existingUserVerifiedByUsername) {
             return Response.json({
                 success: false,
                 message: "Username is already taken"
             }, { status: 400 });
         }
-        const existingUserByEmail = await UserModel.findOne({ email })
+
+        // Logic to allow username takeover: 
+        // If an UNVERIFIED user exists with this username, delete them so the new user can have it.
+        // This prevents the E11000 duplicate key error.
+        await UserModel.deleteOne({ username, isVerified: false });
+
+        const existingUserByEmail = await UserModel.findOne({ email });
         const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+
         if (existingUserByEmail) {
-            if (existingUserByEmail.isVerified)
+            if (existingUserByEmail.isVerified) {
                 return Response.json({
                     success: false,
                     message: "User with this email already exists"
                 }, { status: 400 });
-            else {
+            } else {
                 const hashedPassword = await bcrypt.hash(password, 12);
-                existingUserByEmail.password = hashedPassword
-                existingUserByEmail.verifyCode = verifyCode
-                existingUserByEmail.verifyCodeExpiry = new Date(Date.now() + 3600000)
-                await existingUserByEmail.save()
+                existingUserByEmail.username = username; // Update username in case it changed
+                existingUserByEmail.password = hashedPassword;
+                existingUserByEmail.verifyCode = verifyCode;
+                existingUserByEmail.verifyCodeExpiry = new Date(Date.now() + 3600000);
+                await existingUserByEmail.save();
             }
         } else {
             const hashedPassword = await bcrypt.hash(password, 12);
 
-            const expiryDate = new Date()
-            expiryDate.setHours(expiryDate.getHours() + 1)
+            const expiryDate = new Date();
+            expiryDate.setHours(expiryDate.getHours() + 1);
 
             const newUser = new UserModel({
                 username,
@@ -45,9 +55,8 @@ export async function POST(request: Request) {
                 isVerified: false,
                 isAcceptingMessage: true,
                 messages: []
-            })
-            await newUser.save()
-
+            });
+            await newUser.save();
         }
 
         const emailResponse = await sendVerificationEmail(email, username, verifyCode);
@@ -55,19 +64,19 @@ export async function POST(request: Request) {
             return Response.json({
                 success: false,
                 message: emailResponse.message
-            }, { status: 500 })
+            }, { status: 500 });
         }
 
         return Response.json({
             success: true,
             message: "User registered successfully, please verify your email"
-        }, { status: 201 })
+        }, { status: 201 });
 
     } catch (error) {
-        console.error("Error registering user", error)
+        console.error("Error registering user", error);
         return Response.json({
             success: false,
-            message: "Error registering user"
+            message: "Error registering user abc"
         }, { status: 500 });
     }
 }
