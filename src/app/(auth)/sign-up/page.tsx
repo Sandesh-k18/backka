@@ -109,7 +109,7 @@ const SignUpPage = () => {
                                     {usernameMessage}
                                 </p>
                                 <FormDescription >
-                                    This is you public display name.
+                                    This is your public display name.
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
