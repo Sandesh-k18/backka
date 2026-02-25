@@ -3,6 +3,8 @@ import { Poppins } from "next/font/google";
 import AuthProvider from "@/src/context/AuthProvider";
 import "./globals.css";
 import { Toaster } from "@/src/components/ui/sonner";
+import { Navbar } from '@/src/components/pageComponents/Navbar';
+import Footer from "../components/pageComponents/Footer";
 
 export const metadata: Metadata = {
   title: "backKA",
@@ -20,13 +22,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <AuthProvider>
-      <body className={`${poppins.className}`}>
-        {children}
-        <Toaster />
-      </body>
+        <body className={`${poppins.className} flex flex-col min-h-screen m-0 p-0 overflow-x-hidden`}>
+          <Navbar />
+          {children}
+          <Toaster />
+          <Footer />
+        </body>
       </AuthProvider>
+      
     </html>
   );
 }

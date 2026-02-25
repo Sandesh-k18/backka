@@ -41,7 +41,9 @@ export const authOptions: NextAuthOptions = {
                         return {
                             id: user._id.toString(),
                             email: user.email,
-                            username: user.username
+                            username: user.username,
+                            isVerified: user.isVerified,
+                            isAcceptingMessages: user.isAcceptingMessage
                         }; // or return user;
                     } else {
                         return null;
@@ -56,22 +58,29 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token._id = user._id?.toString();
+                // Mapping the ID from authorize() to token._id
+                token._id = user.id;
+                token.username = user.username;
+                // Note: If you want these in the token, 
+                // the authorize() function must return them!
                 token.isVerified = user.isVerified;
                 token.isAcceptingMessages = user.isAcceptingMessages;
-                token.username = user.username;
             }
             return token;
         },
         async session({ session, token }) {
             if (token) {
-                session.user.id = token._id as string;
+                // CRITICAL: Ensure this matches what your API route is calling.
+                // If API uses user._id, use session.user._id here.
+                session.user._id = token._id as string;
+                session.user.username = token.username as string;
+                // Adding other fields if needed
                 session.user.isVerified = token.isVerified as boolean;
                 session.user.isAcceptingMessages = token.isAcceptingMessages as boolean;
-                session.user.username = token.username as string;
             }
             return session;
         }
+
     },
     pages: {
         signIn: "/sign-in"

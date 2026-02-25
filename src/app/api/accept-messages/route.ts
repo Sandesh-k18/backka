@@ -1,10 +1,8 @@
 import { getServerSession } from "next-auth";
-
 import { authOptions } from "../auth/[...nextauth]/options";
 import dbConnect from "@/src/lib/dbConnect";
 import UserModel from "@/src/model/User";
 import { User } from "next-auth";
-
 
 export async function POST(request: Request) {
     await dbConnect();
@@ -12,13 +10,11 @@ export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
     const user: User = session?.user as User;
 
-
     if (!session || !session.user) {
         return Response.json({
             success: false,
             message: "Unauthorized"
         }, { status: 401 });
-
     }
 
     const userId = user._id;
@@ -27,7 +23,8 @@ export async function POST(request: Request) {
     try {
         const updatedUser = await UserModel.findByIdAndUpdate(
             userId,
-            { isAcceptingMessages: acceptMessages },
+            // FIX: Changed 'isAcceptingMessages' to 'isAcceptingMessage' to match your Schema
+            { isAcceptingMessage: acceptMessages }, 
             { new: true }
         );
 
@@ -40,14 +37,15 @@ export async function POST(request: Request) {
 
         return Response.json({
             success: true,
-            message: "Accepting messages successfully"
+            isAcceptingMessage: updatedUser.isAcceptingMessage,
+            message: "acceptMessages toggled successfully"
         }, { status: 200 });
 
     } catch (error) {
         console.error("Error toggling acceptMessages:", error);
         return Response.json({
             success: false,
-            message: "Error toggling acceptMessages" //failed to update user status to accept messages
+            message: "Error toggling acceptMessages"
         }, { status: 500 });
     }
 }
@@ -58,13 +56,11 @@ export async function GET(request: Request) {
     const session = await getServerSession(authOptions);
     const user: User = session?.user as User;
 
-
     if (!session || !session.user) {
         return Response.json({
             success: false,
             message: "Unauthorized"
         }, { status: 401 });
-
     }
 
     const userId = user._id;
@@ -81,14 +77,15 @@ export async function GET(request: Request) {
 
         return Response.json({
             success: true,
-            isAcceptingMessages: foundUser.isAcceptingMessage
+            // FIX: Ensure the key returned matches what your Dashboard expects
+            // Your dashboard uses: response.data.isAcceptingMessage
+            isAcceptingMessage: foundUser.isAcceptingMessage 
         }, { status: 200 });
     } catch (error) {
         console.error("Error in getting message acceptance status", error);
         return Response.json({
             success: false,
-            message: "Error in getting message acceptance status" //failed to get user status of accepting messages
+            message: "Error in getting message acceptance status"
         }, { status: 500 });
     }
-
 }

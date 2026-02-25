@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Welcome Message",
+    "content": "Welcome to your feedback dashboard! This is where you can read anonymous messages sent by your followers.",
+    "received": "2026-02-20T10:30:00Z"
+  },
+  {
+    "title": "Feature Request",
+    "content": "It would be great if we could attach images to the feedback forms. Any plans for that in the future?",
+    "received": "2026-02-21T14:45:00Z"
+  },
+  {
+    "title": "Kind Words",
+    "content": "Just wanted to say that your recent project was super inspiring. Keep up the amazing work!",
+    "received": "2026-02-22T09:15:00Z"
+  },
+  {
+    "title": "Anonymous Tip",
+    "content": "Check out the new API documentation for better performance on aggregation queries. It saved me hours.",
+    "received": "2026-02-23T18:20:00Z"
+  },
+  {
+    "title": "Question",
+    "content": "How long did it take you to learn Next.js and Tailwind CSS? Everything looks so polished.",
+    "received": "2026-02-24T22:10:00Z"
+  }
+]
