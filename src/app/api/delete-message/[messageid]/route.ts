@@ -1,31 +1,35 @@
 import { getServerSession } from "next-auth";
-
 import { authOptions } from "../../auth/[...nextauth]/options";
 import dbConnect from "@/src/lib/dbConnect";
 import UserModel from "@/src/model/User";
 import { User } from "next-auth";
 
-export async function DELETE(request: Request, { params }: { params: { messageid: string } }) {
-    const messageId = params.messageid
+// Notice the type change for params: it is now a Promise
+export async function DELETE(
+    request: Request,
+    { params }: { params: Promise<{ messageid: string }> }
+) {
+    // 1. You MUST await params in Next.js 15/16
+    const { messageid } = await params;
+
     await dbConnect();
 
     const session = await getServerSession(authOptions);
     const user: User = session?.user as User;
-
 
     if (!session || !session.user) {
         return Response.json({
             success: false,
             message: "Unauthorized"
         }, { status: 401 });
-
     }
 
     try {
         const updatedResult = await UserModel.updateOne(
             { _id: user._id },
             {
-                $pull: { messages: { _id: messageId } }
+                // messageid is now string, MongoDB handles the conversion to ObjectId
+                $pull: { messages: { _id: messageid } }
             }
         );
 
@@ -42,11 +46,10 @@ export async function DELETE(request: Request, { params }: { params: { messageid
         }, { status: 200 });
 
     } catch (error) {
+        console.error("Delete Error:", error);
         return Response.json({
             success: false,
             message: "Error deleting message"
         }, { status: 500 });
     }
-
-
 }
