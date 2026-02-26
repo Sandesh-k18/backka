@@ -7,17 +7,16 @@ import { signOut, useSession } from 'next-auth/react';
 import { User } from 'next-auth';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import Image from 'next/image';
 import {
     Loader2,
-    MessageSquareQuote,
     BadgeCheck,
     ShieldAlert,
     Menu,
     LogOut,
     Home,
     Info,
-    HelpCircle,
-    Sparkles
+    HelpCircle
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -43,7 +42,6 @@ export const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [showUnverifiedTip, setShowUnverifiedTip] = useState(false);
 
-    // Track if user explicitly closed it during this "session" on the page
     const hasDismissedRef = useRef(false);
     const wasDashboardRef = useRef(pathname.startsWith('/dashboard'));
     const user = useMemo(() => session?.user as User, [session]);
@@ -57,13 +55,11 @@ export const Navbar = () => {
         if (status === "authenticated" && !user?.isVerified) {
             const crossedBoundary = isNowDashboard !== wasDashboardRef.current;
 
-            // Reset dismissal if we switch between dashboard and public pages
             if (crossedBoundary) {
                 hasDismissedRef.current = false;
                 wasDashboardRef.current = isNowDashboard;
             }
 
-            // Only trigger if not already showing and hasn't been dismissed yet
             if (!showUnverifiedTip && !hasDismissedRef.current) {
                 const timer = setTimeout(() => setShowUnverifiedTip(true), 800);
                 return () => clearTimeout(timer);
@@ -71,10 +67,10 @@ export const Navbar = () => {
         }
 
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [status, user?.isVerified, pathname]); // Removed showUnverifiedTip from here to stop the loop
+    }, [status, user?.isVerified, pathname, showUnverifiedTip]);
 
     const closeTip = () => {
-        hasDismissedRef.current = true; // Mark as dismissed
+        hasDismissedRef.current = true;
         setShowUnverifiedTip(false);
     };
 
@@ -105,8 +101,15 @@ export const Navbar = () => {
                                 <SheetContent side="left" className="w-[280px]">
                                     <SheetHeader className="text-left">
                                         <div className="flex items-center gap-2 mb-4">
-                                            <div className="bg-indigo-600 p-1.5 rounded-lg">
-                                                <MessageSquareQuote className="w-5 h-5 text-white" />
+                                            {/* MOBILE MENU LOGO - Removed indigo background */}
+                                            <div className="overflow-hidden flex items-center justify-center w-10 h-10">
+                                                <Image 
+                                                    src="/backka.webp" 
+                                                    alt="Logo" 
+                                                    width={80} 
+                                                    height={80} 
+                                                    className="w-full h-full object-contain" 
+                                                />
                                             </div>
                                             <span className="text-xl font-bold tracking-tight text-gray-900">backKA</span>
                                         </div>
@@ -126,8 +129,16 @@ export const Navbar = () => {
                     )}
 
                     <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-90">
-                        <div className="bg-indigo-600 p-1.5 rounded-lg shadow-lg shadow-indigo-200/50">
-                            <MessageSquareQuote className="w-5 h-5 text-white" />
+                        {/* MAIN NAVBAR LOGO - Removed indigo background and shadow */}
+                        <div className="overflow-hidden flex items-center justify-center w-11 h-11">
+                            <Image
+                                src="/backka.webp"
+                                alt="Logo"
+                                width={88}
+                                height={88}
+                                className="w-full h-full object-contain"
+                                priority
+                            />
                         </div>
                         <span className="text-xl font-bold tracking-tight text-gray-900">backKA</span>
                     </Link>
@@ -148,7 +159,6 @@ export const Navbar = () => {
                         <Loader2 className="animate-spin text-indigo-600 w-5 h-5" />
                     ) : session ? (
                         <div className="flex items-center gap-2">
-                            {/* User Info & Floating Tip */}
                             <div className="flex flex-col items-end border-r border-gray-200 pr-3 mr-1 relative">
                                 <span className="text-xs font-bold text-gray-900 leading-none mb-1">
                                     {user.username || user.email?.split('@')[0]}
@@ -175,9 +185,15 @@ export const Navbar = () => {
                                             <div className="absolute -top-1.5 right-4 w-3 h-3 bg-indigo-600 rotate-45 border-l border-t border-indigo-400" />
                                             <div className="flex flex-col gap-3">
                                                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-indigo-50/50 border border-indigo-100/50 mb-4">
-                                                    {/* Icon Container with a soft glow */}
-                                                    <div className="bg-indigo-600 p-1.5 rounded-lg shrink-0 shadow-sm shadow-indigo-200">
-                                                        <Sparkles className="w-3.5 h-3.5 text-white" />
+                                                    {/* TIP LOGO - Removed indigo background */}
+                                                    <div className="shrink-0 overflow-hidden w-7 h-7 flex items-center justify-center">
+                                                        <Image 
+                                                            src="/backka.webp" 
+                                                            alt="Logo" 
+                                                            width={56} 
+                                                            height={56} 
+                                                            className="w-full h-full object-contain" 
+                                                        />
                                                     </div>
 
                                                     <div className="flex flex-col gap-1">
@@ -210,29 +226,31 @@ export const Navbar = () => {
                             </div>
 
                             {isDashboard ? (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="icon" className="rounded-full h-9 w-9 border-gray-200">
-                                            <Menu className="h-4 w-4 text-gray-600" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-56 mt-2 rounded-2xl p-2 shadow-2xl">
-                                        <DropdownMenuLabel className="flex flex-col gap-1 px-3 py-2">
-                                            <span className="text-xs font-bold text-gray-900 truncate">{user.username || user.email}</span>
-                                            <span className="text-[10px] uppercase tracking-widest text-gray-400 font-medium">Dashboard Menu</span>
-                                        </DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem asChild>
-                                            <Link href="/" className="flex items-center gap-2 py-2 cursor-pointer font-medium hover:text-indigo-600 transition-colors">
-                                                <Home className="w-4 h-4" /> Home
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/sign-in" })} className="text-red-600 focus:bg-red-50 focus:text-red-700 rounded-lg cursor-pointer">
-                                            <LogOut className="w-4 h-4 mr-2" /> Log Out
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                <div className="flex items-center gap-2">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" size="icon" className="rounded-full h-9 w-9 border-gray-200">
+                                                <Menu className="h-4 w-4 text-gray-600" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-56 mt-2 rounded-2xl p-2 shadow-2xl">
+                                            <DropdownMenuLabel className="flex flex-col gap-1 px-3 py-2">
+                                                <span className="text-xs font-bold text-gray-900 truncate">{user.username || user.email}</span>
+                                                <span className="text-[10px] uppercase tracking-widest text-gray-400 font-medium">Dashboard Menu</span>
+                                            </DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem asChild>
+                                                <Link href="/" className="flex items-center gap-2 py-2 cursor-pointer font-medium hover:text-indigo-600 transition-colors">
+                                                    <Home className="w-4 h-4" /> Home
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/sign-in" })} className="text-red-600 focus:bg-red-50 focus:text-red-700 rounded-lg cursor-pointer">
+                                                <LogOut className="w-4 h-4 mr-2" /> Log Out
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             ) : (
                                 <Button
                                     variant="outline" size="sm"

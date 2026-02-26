@@ -5,19 +5,24 @@ export default function FAQPage() {
     const faqs = [
         {
             question: "How do I verify my account?",
-            answer: "Account verification is handled through your dashboard settings. Once you complete your profile information, our team reviews it within 24 hours."
+            answer: "To verify your account, simply enter the unique 6-digit OTP (One-Time Password) that we have sent directly to your registered email address. Once you submit the correct code, your account will be fully activated and ready for use."
+        },
+        {
+            question: "What happens if I don't verify my username?",
+            answer: "Your account is considered temporary. Once the username is verified by a legitimate owner, all existing whispers and data on the unverified profile are permanently erased to ensure security and privacy."
         },
         {
             question: "Is my data secure with backKA?",
-            answer: "Absolutely. We use industry-standard AES-256 encryption for all data at rest and TLS for data in transit."
+            answer: "Yes. We utilize MongoDB Atlas for data persistence, which enforces AES-256 encryption at rest by default. Furthermore, all data in transit is protected via TLS 1.2+ to prevent interception. By combining industry-standard encryption with a strict minimal-data collection policy, we ensure your whispers remain private and secure."
         },
+
         {
             question: "Can I use backKA for free?",
-            answer: "Yes! We offer a generous free tier for individuals. Professional and Enterprise plans are available for larger teams requiring more resources."
+            answer: "Yes! We offer a generous free tier for individuals. Professional and Enterprise plans will available soon for larger teams requiring more resources."
         },
         {
             question: "How do I reset my password?",
-            answer: "On the Sign In page, click 'Forgot Password' and follow the instructions sent to your registered email address."
+            answer: "No available yet."
         }
     ];
 
