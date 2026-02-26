@@ -20,13 +20,20 @@ import { Textarea } from '@/src/components/ui/textarea';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { useParams } from 'next/navigation';
-import { messageSchema } from '@/src/schemas/messageSchema'; // Ensure you have this schema
+import { messageSchema } from '@/src/schemas/messageSchema'; 
 import { ApiResponse } from '@/src/types/apiResponse';
 
 export default function SendMessage() {
   const params = useParams<{ username: string }>();
   const username = params.username;
   const [isLoading, setIsLoading] = useState(false);
+  const [suggestedMessages, setSuggestedMessages] = useState<string[]>([
+    "What's your favorite movie?",
+    "Do you have any pets?",
+    "What's your dream job?",
+  ]);
+  const [isSuggestLoading, setIsSuggestLoading] = useState(false);
+  const [isCooldown, setIsCooldown] = useState(false); // New: Prevents button spam
 
   const form = useForm<z.infer<typeof messageSchema>>({
     resolver: zodResolver(messageSchema),
@@ -55,6 +62,39 @@ export default function SendMessage() {
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const suggestMessages = async () => {
+    if (isCooldown) {
+      toast.error("Please wait a few seconds before requesting again.");
+      return;
+    }
+
+    setIsSuggestLoading(true);
+
+    try {
+      const response = await axios.post('/api/suggest-messages');
+      const rawQuestions = response.data?.questions;
+
+      if (!rawQuestions) {
+        throw new Error("No questions returned");
+      }
+
+      const questionsArray = rawQuestions.split('||');
+      setSuggestedMessages(questionsArray);
+      toast.success("New suggestions generated!");
+
+      // Start a 5-second cooldown
+      setIsCooldown(true);
+      setTimeout(() => setIsCooldown(false), 10000);
+
+    } catch (error: any) {
+      console.error(error);
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to fetch AI suggestions";
+      toast.error(errorMessage);
+    } finally {
+      setIsSuggestLoading(false);
     }
   };
 
@@ -100,11 +140,15 @@ export default function SendMessage() {
       <div className="space-y-4 my-8">
         <div className="space-y-2">
           <Button
-            onClick={() => {/* Add AI Suggestion Logic Here */}}
+            onClick={suggestMessages}
+            disabled={isSuggestLoading || isCooldown} // Disabled during loading or cooldown
             className="my-4"
             variant="outline"
           >
-            Suggest Messages
+            {isSuggestLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            {isCooldown ? "Wait 10s..." : "Suggest Messages"}
           </Button>
           <p>Click on any message below to select it.</p>
         </div>
@@ -113,8 +157,7 @@ export default function SendMessage() {
             <h3 className="text-xl font-semibold">Messages</h3>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-             {/* Example suggested messages */}
-            {["What's your favorite movie?", "Do you have any pets?", "What's your dream job?"].map((message, index) => (
+            {suggestedMessages.map((message, index) => (
               <Button
                 key={index}
                 variant="outline"

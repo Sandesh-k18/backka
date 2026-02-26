@@ -14,19 +14,17 @@ import axios, { AxiosError } from 'axios';
 import { ApiResponse } from '@/src/types/apiResponse';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const SignUpPage = () => {
     const [username, setUsername] = useState('');
     const [usernameMessage, setUsernameMessage] = useState('');
     const [isCheckingUsername, setIsCheckingUsername] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    // const {toast} = useToast(); Not used now
-    // Note: useDebounceValue returns [value, setValue]
+    
     const debounced = useDebounceCallback(setUsername, 500);
     const router = useRouter();
 
-    //zod form setup
     const form = useForm<z.infer<typeof signUpSchema>>({
         resolver: zodResolver(signUpSchema),
         defaultValues: {
@@ -36,22 +34,17 @@ const SignUpPage = () => {
         }
     });
 
-    // Handle Username Uniqueness Check
     useEffect(() => {
         const checkUsernameUnique = async () => {
-            if (username.length >= 1) { // Only check if more than 1 character
+            if (username.length > 2) {
                 setIsCheckingUsername(true);
                 setUsernameMessage('');
                 try {
                     const response = await axios.get(`/api/username-unique?username=${username}`);
-                    console.log(response.data.message);
-
                     setUsernameMessage(response.data.message);
                 } catch (error) {
                     const axiosError = error as AxiosError<ApiResponse>;
-                    setUsernameMessage(
-                        axiosError.response?.data.message ?? "Error checking username"
-                    );
+                    setUsernameMessage(axiosError.response?.data.message ?? "Error checking username");
                 } finally {
                     setIsCheckingUsername(false);
                 }
@@ -64,93 +57,101 @@ const SignUpPage = () => {
         setIsSubmitting(true);
         try {
             const response = await axios.post<ApiResponse>('/api/sign-up', data);
-            toast.success("Success", { description: response.data.message });
-
-            // Redirect using the data from the form
-            router.replace(`/verify/${data.username}`); //TODO
-            setIsSubmitting(false);
+            toast.success("Account created", { description: response.data.message });
+            router.replace(`/verify/${data.username}`);
         } catch (error) {
-            console.error("Sign up error:", error);
             const axiosError = error as AxiosError<ApiResponse>;
-            let errorMessage = axiosError.response?.data.message;
-            toast.error("Sign up failed", {
-                description: errorMessage
-            });
+            toast.error("Sign up failed", { description: axiosError.response?.data.message });
+        } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-lg">
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12">
+            <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl border border-slate-200 shadow-xl">
                 <div className="text-center">
-                    <h1 className="text-2xl font-extrabold tracking-tight lg:text-5xl mb-6">Join Us</h1>
-                    <p className="mb-4 text-gray-600">Sign up to start your adventure</p>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">Create Account</h1>
+                    <p className="text-slate-600">Join our community today</p>
                 </div>
+
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                         <FormField control={form.control} name="username" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Username</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="username" {...field}
-                                        onChange={(e) => {
-                                            field.onChange(e);
-                                            debounced(e.target.value);
-                                        }}
-                                    />
-                                </FormControl>
-                                {
-                                    isCheckingUsername && <Loader2 className="animate-spin ml-2 h-4 w-4" />
-                                }
-                                <p
-                                    className={`text-sm mt-1 ${usernameMessage === "Username is unique" ? "text-green-500" : "text-red-500"}`}
-                                >
-                                    {usernameMessage}
-                                </p>
-                                <FormDescription >
-                                    This is your public display name.
-                                </FormDescription>
+                                <FormLabel className="text-slate-700">Username</FormLabel>
+                                <div className="relative">
+                                    <FormControl>
+                                        <Input 
+                                            placeholder="Choose a unique username" 
+                                            className="h-11 pr-10"
+                                            {...field}
+                                            onChange={(e) => {
+                                                field.onChange(e);
+                                                debounced(e.target.value);
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <div className="absolute right-3 top-3">
+                                        {isCheckingUsername && <Loader2 className="animate-spin h-5 w-5 text-slate-400" />}
+                                        {!isCheckingUsername && usernameMessage === "Username is unique" && <CheckCircle2 className="h-5 w-5 text-green-500" />}
+                                        {!isCheckingUsername && usernameMessage && usernameMessage !== "Username is unique" && <AlertCircle className="h-5 w-5 text-red-500" />}
+                                    </div>
+                                </div>
+                                {usernameMessage && (
+                                    <p className={`text-[13px] font-medium flex items-center gap-1 ${usernameMessage === "Username is unique" ? "text-green-600" : "text-red-500"}`}>
+                                        {usernameMessage}
+                                    </p>
+                                )}
                                 <FormMessage />
                             </FormItem>
                         )} />
+
                         <FormField control={form.control} name="email" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel className="text-slate-700">Email Address</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="email" {...field}
-                                    />
+                                    <Input placeholder="name@example.com" className="h-11" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )} />
+
                         <FormField control={form.control} name="password" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Password</FormLabel>
+                                <FormLabel className="text-slate-700">Password</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="password" {...field} type="password"
-                                    />
+                                    <Input type="password" placeholder="••••••••" className="h-11" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )} />
-                        <Button type="submit" className="w-full" disabled={isSubmitting || isCheckingUsername || usernameMessage === "Username is already taken"}>
-                            {isSubmitting ? (<>
-                                <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                                Signing Up...
-                            </>) : (
-                                "Sign Up")
-                            }
+
+                        <Button 
+                            type="submit" 
+                            className="w-full h-11 text-base font-semibold shadow-sm" 
+                            disabled={isSubmitting || isCheckingUsername || (usernameMessage !== "" && usernameMessage !== "Username is unique")}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Creating Account...
+                                </>
+                            ) : "Sign Up"}
                         </Button>
                     </form>
                 </Form>
-                <div className="text-center mt-4 text-sm">
+
+                <div className="text-center text-sm text-slate-500 pt-4 border-t border-slate-100">
                     <p>
-                        Already a member? <Link href="/sign-in" className="text-blue-600 hover:text-blue-800 font-medium">Sign In</Link>
+                        Already have an account?{" "}
+                        <Link href="/sign-in" className="text-primary hover:underline font-semibold decoration-2 underline-offset-4">
+                            Log in
+                        </Link>
                     </p>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 

@@ -1,5 +1,6 @@
 "use client"
 
+import React from 'react';
 import { Card, CardHeader, CardTitle } from '@/src/components/ui/card';
 import {
     AlertDialog,
@@ -26,6 +27,7 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+
 dayjs.extend(relativeTime);
 
 type MessageCardProps = {
@@ -46,32 +48,37 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
     }
 
     return (
-        <Card className="card-bordered flex flex-col justify-between h-full">
-            <CardHeader>
-                <div className="flex justify-between items-start gap-2">
-                    {/* The content is truncated here to keep the card size consistent */}
-                    <div className="flex-grow overflow-hidden">
-                        <CardTitle className="text-md font-medium line-clamp-3 break-words">
+        <Card className="card-bordered flex flex-col justify-between h-full w-full min-w-0 overflow-hidden shadow-sm">
+            <CardHeader className="p-4 sm:p-6">
+                {/* 1. Use 'grid' instead of 'flex' for the header to lock column widths */}
+                <div className="grid grid-cols-[1fr_auto] items-start gap-3">
+                    
+                    {/* 2. Content Container: 'min-w-0' is vital to prevent grid blowout */}
+                    <div className="min-w-0">
+                        <CardTitle 
+                            className="text-sm sm:text-md font-medium leading-snug whitespace-pre-wrap break-all sm:break-words line-clamp-6"
+                            style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+                        >
                             {message.content}
                         </CardTitle>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                        {/* DELETE BUTTON (AlertDialog) */}
+                    {/* 3. Action Buttons: Explicitly fixed width to prevent distortion */}
+                    <div className="flex flex-col gap-2 w-8 items-center">
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
-                                <Button variant="destructive" size="icon" className="h-8 w-8">
+                                <Button variant="destructive" size="icon" className="h-8 w-8 shrink-0">
                                     <X className="w-4 h-4" />
                                 </Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent>
+                            <AlertDialogContent className="w-[90vw] max-w-[400px]">
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>Delete Message?</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                        This will permanently remove this whisper from your dashboard.
+                                        This will permanently remove this whisper.
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
-                                <AlertDialogFooter>
+                                <AlertDialogFooter className="gap-2">
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction onClick={handleDeleteConfirm} className="bg-red-600">
                                         Delete
@@ -80,20 +87,19 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
                             </AlertDialogContent>
                         </AlertDialog>
 
-                        {/* EXPAND/POP-UP BUTTON (Dialog) */}
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button variant="outline" size="icon" className="h-8 w-8">
+                                <Button variant="outline" size="icon" className="h-8 w-8 shrink-0">
                                     <Maximize2 className="w-4 h-4" />
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px] md:max-w-[700px]">
+                            <DialogContent className="w-[95vw] sm:max-w-[500px]">
                                 <DialogHeader>
-                                    <DialogTitle className="text-sm text-muted-foreground">
+                                    <DialogTitle className="text-[10px] text-muted-foreground uppercase">
                                         Received: {dayjs(message.createdAt).format('MMM D, YYYY h:mm A')}
                                     </DialogTitle>
                                 </DialogHeader>
-                                <div className="py-4 text-lg leading-relaxed whitespace-pre-wrap max-h-[60vh] overflow-y-auto">
+                                <div className="py-4 text-base sm:text-lg whitespace-pre-wrap break-all overflow-y-auto max-h-[60vh]">
                                     {message.content}
                                 </div>
                             </DialogContent>
@@ -101,12 +107,13 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
                     </div>
                 </div>
 
-                <div className="text-[10px] text-muted-foreground mt-4 italic">
-                    {dayjs(message.createdAt).fromNow()}
-                    {/* //relativetime is used here */}
-                </div>
-                <div className="text-xs text-muted-foreground mt-2">
-                    {dayjs(message.createdAt).format('MMM D, YYYY h:mm A')}
+                <div className="mt-4 pt-2 border-t border-gray-50 flex flex-col gap-1">
+                    <span className="text-[10px] text-muted-foreground italic">
+                        {dayjs(message.createdAt).fromNow()}
+                    </span>
+                    <span className="text-[10px] sm:text-xs text-muted-foreground opacity-75">
+                        {dayjs(message.createdAt).format('MMM D, YYYY h:mm A')}
+                    </span>
                 </div>
             </CardHeader>
         </Card>

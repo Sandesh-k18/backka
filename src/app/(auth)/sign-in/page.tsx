@@ -11,13 +11,13 @@ import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import { signInSchema } from '@/src/schemas/signInSchema';
 import { signIn } from 'next-auth/react';
+import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 const SignInPage = () => {
-
-
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  //zod form setup
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -27,12 +27,15 @@ const SignInPage = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
+    setIsSubmitting(true);
     const result = await signIn("credentials", {
       identifier: data.identifier,
       password: data.password,
       redirect: false
     });
+
     if (result?.error) {
+      setIsSubmitting(false);
       if (result.error === 'CredentialsSignin') {
         toast.error("Login Failed", {
           description: "Incorrect username or password",
@@ -43,56 +46,75 @@ const SignInPage = () => {
         });
       }
     }
-    if (result?.ok) { // better than result.url
-      toast.success("Signed in successfully!");
+
+    if (result?.ok) {
+      toast.success(`Welcome ${data.identifier} !`);
       router.replace("/dashboard");
     }
-
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl border border-slate-200 shadow-xl">
         <div className="text-center">
-          <h1 className="text-2xl font-extrabold tracking-tight lg:text-5xl mb-6">Join Us</h1>
-          <p className="mb-4 text-gray-600">Sign in to start your adventure</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
+            Welcome
+          </h1>
+          <p className="text-slate-600">Enter your credentials to access your account</p>
         </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField control={form.control} name="identifier" render={({ field }) => (
               <FormItem>
-                <FormLabel>Email/Username</FormLabel>
+                <FormLabel className="text-slate-700">Email or Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="email/username" {...field}
+                  <Input
+                    placeholder="Enter your email/username"
+                    className="h-11 shadow-sm"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )} />
+
             <FormField control={form.control} name="password" render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel className="text-slate-700">Password</FormLabel>
                 <FormControl>
-                  <Input placeholder="password" {...field} type="password"
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    className="h-11 shadow-sm"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )} />
-            <Button type="submit" className="w-full"
-            >
-              Sign In
+
+            <Button type="submit" className="w-full h-11 text-base font-semibold transition-all hover:bg-slate-800" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Authenticating...
+                </>
+              ) : "Sign In"}
             </Button>
           </form>
         </Form>
-        <div className="text-center mt-4 text-sm">
+
+        <div className="text-center text-sm text-slate-500 pt-4 border-t border-slate-100">
           <p>
-            Not a member yet? <Link href="/sign-up" className="text-blue-600 hover:text-blue-800 font-medium">Sign Up</Link>
+            Don&apos;t have an account?{" "}
+            <Link href="/sign-up" className="text-primary hover:underline font-semibold decoration-2 underline-offset-4">
+              Create an account
+            </Link>
           </p>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 
