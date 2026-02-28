@@ -9,7 +9,6 @@ export async function GET(request: Request) {
     await dbConnect();
 
     const session = await getServerSession(authOptions);
-    // Cast the user session safely
     const user: User = session?.user as User;
 
     if (!session || !session.user) {
@@ -19,23 +18,20 @@ export async function GET(request: Request) {
         }, { status: 401 });
     }
 
-    // Convert string ID to Mongoose ObjectId
-    // This is safe because _id never changes, unlike usernames.
-    const userId = new mongoose.Types.ObjectId(user._id);
+    const userId = new mongoose.Types.ObjectId(user._id); //mongoose object id from string _id, since user._id is string but we need to query with mongoose object id for better performance during searching of messages array.
 
     try {
-        // 1. Check if the user exists
+        // 1. First, check if the user actually exists in the DB to rule out ID mismatches
         const userExists = await UserModel.findById(userId);
         
         if (!userExists) {
             return Response.json({
                 success: false,
-                message: "User not found"
+                message: "User not found in database"
             }, { status: 404 });
         }
 
         // 2. Perform aggregation to get sorted messages
-        // Since we match by _id, case-sensitivity of the username doesn't matter here.
         const userWithMessages = await UserModel.aggregate([
             { $match: { _id: userId } },
             { $unwind: { path: "$messages", preserveNullAndEmptyArrays: true } }, 
@@ -43,12 +39,10 @@ export async function GET(request: Request) {
             { $group: { _id: "$_id", messages: { $push: "$messages" } } }
         ]);
 
-        // 3. Extract and filter messages
-        // Aggregation returns an array, so we take the first element [0]
+        // 3. Extract messages safely
+        // If messages array is empty or contains a null element (from unwind), return []
         const rawMessages = userWithMessages[0]?.messages || [];
-        
-        // Remove nulls (which can happen from preserveNullAndEmptyArrays if messages array was empty)
-        const cleanMessages = rawMessages.filter((msg: any) => msg && msg._id);
+        const cleanMessages = rawMessages.filter((msg: any) => msg && msg.content);
 
         return Response.json({
             success: true,
@@ -56,7 +50,7 @@ export async function GET(request: Request) {
         }, { status: 200 });
 
     } catch (error) {
-        console.error("Error fetching messages via aggregation:", error);
+        console.error("Error getting messages:", error);
         return Response.json({
             success: false,
             message: "Internal Server Error"

@@ -1,73 +1,58 @@
-import { HelpCircle, ChevronRight, MessageSquare, Shield, Zap, Lock, Globe, UserCheck } from 'lucide-react';
+import { HelpCircle, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function FAQPage() {
     const faqs = [
         {
             question: "How do I verify my account?",
-            answer: "To verify your account, simply enter the unique 6-digit OTP (One-Time Password) sent to your registered email address. Once submitted, your account will be fully activated."
+            answer: "To verify your account, simply enter the unique 6-digit OTP (One-Time Password) that we have sent directly to your registered email address. Once you submit the correct code, your account will be fully activated and ready for use."
         },
         {
             question: "What happens if I don't verify my username?",
-            answer: "Unverified accounts are temporary. If a legitimate owner verifies that username, all existing whispers and data on the unverified profile are permanently erased to ensure security."
+            answer: "Your account is considered temporary. Once the username is verified by a legitimate owner, all existing whispers and data on the unverified profile are permanently erased to ensure security and privacy."
         },
         {
             question: "Is my data secure with backKA?",
-            answer: "Absolutely. We use MongoDB Atlas with AES-256 encryption at rest and TLS 1.2+ for data in transit. We maintain a strict minimal-data policy to keep your whispers private."
+            answer: "Yes. We utilize MongoDB Atlas for data persistence, which enforces AES-256 encryption at rest by default. Furthermore, all data in transit is protected via TLS 1.2+ to prevent interception. By combining industry-standard encryption with a strict minimal-data collection policy, we ensure your whispers remain private and secure."
         },
-        {
-            question: "How do I reset or change my password?",
-            answer: "You can update your password anytime via the Security Center in your Dashboard settings. For security reasons, you will be logged out and asked to sign back in after a successful change."
-        },
-        {
-            question: "Are the messages truly anonymous?",
-            answer: "Yes. We do not attach sender metadata (like IP addresses or account IDs) to the messages. The recipient sees only the content of the 'whisper'."
-        },
-        {
-            question: "Can I change my username later?",
-            answer: "Usernames are currently unique and permanent once verified. We recommend choosing a name you are comfortable with for the long term."
-        },
-        {
-            question: "Is there a limit to how many messages I can receive?",
-            answer: "Our free tier allows for unlimited received messages. However, we implement rate limiting on how fast messages can be sent to a single profile to prevent spam."
-        },
+
         {
             question: "Can I use backKA for free?",
-            answer: "Yes! We offer a generous free tier for individuals. Professional plans with advanced analytics and custom branding will be available soon."
+            answer: "Yes! We offer a generous free tier for individuals. Professional and Enterprise plans will available soon for larger teams requiring more resources."
+        },
+        {
+            question: "How do I reset my password?",
+            answer: "No available yet."
         }
     ];
 
     return (
-        <div className="min-h-screen bg-white pt-24 pb-16 selection:bg-indigo-100">
+        <div className="min-h-screen bg-gray-50/50 pt-20 pb-16">
             <div className="container mx-auto px-6 max-w-4xl">
                 {/* Header */}
-                <div className="text-center mb-20">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-600 text-[10px] font-bold uppercase tracking-widest mb-6 shadow-sm">
-                        <HelpCircle className="w-3.5 h-3.5 text-indigo-600" />
+                <div className="text-center mb-16">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold uppercase tracking-widest mb-6">
+                        <HelpCircle className="w-4 h-4" />
                         Help Center
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-b from-slate-950 via-slate-800 to-indigo-600">
-                        Frequently Asked Questions
-                    </h1>
-                    <p className="text-slate-500 text-lg font-medium">
-                        Everything you need to know about backKA whispers.
-                    </p>
+                    <h1 className="text-4xl font-extrabold text-gray-900 mb-4">Frequently Asked Questions</h1>
+                    <p className="text-gray-500">Everything you need to know about backKA and how it works.</p>
                 </div>
 
-                {/* FAQ List - Premium Cards */}
+                {/* FAQ List */}
                 <div className="space-y-4">
                     {faqs.map((faq, i) => (
                         <div
                             key={i}
-                            className="group p-8 rounded-[2rem] bg-slate-50/50 border border-slate-100 transition-all duration-300 hover:bg-white hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] hover:border-indigo-100 cursor-default"
+                            className="group p-6 rounded-3xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all cursor-default"
                         >
-                            <div className="flex items-start gap-4">
+                            <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-                                        <ChevronRight className="w-4 h-4 text-indigo-600 opacity-0 group-hover:opacity-100 -ml-6 transition-all hidden md:flex" />
+                                    <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                        <ChevronRight className="w-4 h-4 text-indigo-600 opacity-0 group-hover:opacity-100 -ml-6 transition-all" />
                                         {faq.question}
                                     </h3>
-                                    <p className="text-slate-500 leading-relaxed text-sm font-medium antialiased">
+                                    <p className="text-gray-500 leading-relaxed text-sm">
                                         {faq.answer}
                                     </p>
                                 </div>
@@ -76,37 +61,16 @@ export default function FAQPage() {
                     ))}
                 </div>
 
-                {/* Info Grid for Extra Context */}
-                <div className="grid md:grid-cols-3 gap-6 mt-20">
-                    {[
-                        { icon: Shield, title: "Privacy First", desc: "Encrypted & No Tracking" },
-                        { icon: Zap, title: "Fast Delivery", desc: "Instant Real-time Updates" },
-                        { icon: MessageSquare, title: "AI Enhanced", desc: "Smart Prompt Generation" }
-                    ].map((item, idx) => (
-                        <div key={idx} className="p-8 bg-white rounded-[2rem] border border-slate-100 text-center shadow-sm hover:shadow-md transition-shadow">
-                            <item.icon className="w-8 h-8 text-indigo-600 mx-auto mb-4" />
-                            <h4 className="font-bold text-slate-900 mb-1">{item.title}</h4>
-                            <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{item.desc}</p>
-                        </div>
-                    ))}
-                </div>
-
                 {/* CTA */}
-                <div className="mt-20 p-10 rounded-[2.5rem] bg-slate-950 text-center text-white shadow-2xl shadow-indigo-100 overflow-hidden relative">
-                    {/* Background Glow */}
-                    <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-600 rounded-full blur-[100px] opacity-50" />
-                    
-                    <h3 className="text-2xl font-bold mb-3 relative z-10">Still have questions?</h3>
-                    <p className="text-slate-400 mb-8 max-w-md mx-auto relative z-10">
-                        Can't find the answer you're looking for? Reach out to our team.
-                    </p>
+                <div className="mt-16 p-8 rounded-3xl bg-indigo-600 text-center text-white shadow-xl shadow-indigo-200">
+                    <h3 className="text-xl font-bold mb-2">Still have questions?</h3>
+                    <p className="text-indigo-100 mb-6">Can't find the answer you're looking for? Please chat to our friendly team.</p>
                     <Link
                         href="https://github.com/sandesh-k18"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="relative z-10"
                     >
-                        <button className="bg-white text-slate-950 px-10 py-4 rounded-2xl font-bold text-sm hover:bg-slate-100 transition-colors shadow-lg">
+                        <button className="bg-white text-indigo-600 px-8 py-3 rounded-full font-bold text-sm hover:bg-indigo-50 transition-colors">
                             Get in Touch
                         </button>
                     </Link>

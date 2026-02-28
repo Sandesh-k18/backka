@@ -2,22 +2,12 @@ import { z } from "zod"
 
 export const usernameValidation = z
     .string()
-    .min(4, "Username must be at least 4 characters")
+    .min(4, "Username must be atleast 4 characters")
     .max(20, "Username must not exceed 20 characters")
-    // 1. Normalize input immediately
-    .trim()
-    .toLowerCase() 
-    // 2. Updated Regex: Removed A-Z because .toLowerCase() handles it
-    .regex(/^[a-z0-9]+(?:[._-][a-z0-9]+)*$/, "Username can only contain letters, numbers, underscores, and hyphens")
+    .regex(/^[a-zA-Z0-9]+([a-zA-Z0-9](_|-| )[a-zA-Z0-9])*[a-zA-Z0-9]+$/, "Username must not contain special characters ") // if there is only one variable that need to be validated
 
 export const signUpSchema = z.object({
     username: usernameValidation,
-    email: z
-        .string()
-        .email({ message: "Invalid email address" })
-        .trim()
-        .toLowerCase(), // Normalize email too!
-    password: z
-        .string()
-        .min(6, { message: "Password must be at least 6 characters" })
-})
+    email: z.string().email({message: "Invalid email address"}),
+    password: z.string(). min(6, {message: "Password must be atleast 6 characters"})
+}) // if there is more than one variable that need to be validated

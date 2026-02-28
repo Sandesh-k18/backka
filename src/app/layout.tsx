@@ -7,20 +7,17 @@ import { Navbar } from '@/src/components/pageComponents/Navbar';
 import Footer from "../components/pageComponents/Footer";
 
 export const metadata: Metadata = {
-  // 1. Metadata Base (Fixes the warning)
-  metadataBase: new URL("https://backka.sandeshkharel.com.np"),
-
-  // 2. Titles
+  // 1. Titles
   title: {
     default: "backKA | Anonymous Whispers & Feedback",
-    template: "%s | backKA"
+    template: "%s | backKA" // Allows sub-pages like /about to be "About | backKA"
   },
 
-  // 3. Description & Keywords
+  // 2. Description & Keywords
   description: "Send and receive anonymous messages securely. Share your link, hear the truth, and keep the conversation safe with backKA.",
   keywords: ["anonymous messages", "whisper app", "secret feedback", "backKA", "anonymous chat"],
 
-  // 4. Open Graph
+  // 3. Open Graph (How it looks on Facebook/WhatsApp/Discord)
   openGraph: {
     title: "backKA | Anonymous Whispers",
     description: "What do people really think? Send me an anonymous whisper!",
@@ -28,7 +25,7 @@ export const metadata: Metadata = {
     siteName: "backKA",
     images: [
       {
-        url: "/og-image.webp", 
+        url: "/og-image.webp", // Place a 1200x630 image in your public folder
         width: 1200,
         height: 630,
         alt: "backKA Anonymous Messaging",
@@ -38,7 +35,7 @@ export const metadata: Metadata = {
     type: "website",
   },
 
-  // 5. Twitter Card
+  // 4. Twitter Card
   twitter: {
     card: "summary_large_image",
     title: "backKA",
@@ -47,14 +44,14 @@ export const metadata: Metadata = {
     creator: "@Khar3lSand3sh",
   },
 
-  // 6. Favicons & Icons
+  // 5. Favicons & Icons
   icons: {
     icon: "/backka.webp",
     shortcut: "/backka.webp",
     apple: "/backka.webp",
   },
 
-  // 7. Verification
+  // 6. Verification (For Google Search Console)
   verification: {
     google: "Txrgpf0GrAERTWlGg-t3iueVk3KxIj86XBxMreNDAfg",
   },
@@ -72,16 +69,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${poppins.className} flex flex-col min-h-screen m-0 p-0 overflow-x-hidden`}>
-        <AuthProvider>
+      <AuthProvider>
+        <body className={`${poppins.className} flex flex-col min-h-screen m-0 p-0 overflow-x-hidden`}>
           <Navbar />
-          <main className="flex-grow">
-            {children}
-          </main>
+          {children}
           <Toaster />
           <Footer />
-        </AuthProvider>
-      </body>
+        </body>
+      </AuthProvider>
+
     </html>
   );
 }

@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     try {
         const updatedUser = await UserModel.findByIdAndUpdate(
             userId,
-            // Match your Schema field name: 'isAcceptingMessage'
+            // FIX: Changed 'isAcceptingMessages' to 'isAcceptingMessage' to match your Schema
             { isAcceptingMessage: acceptMessages }, 
             { new: true }
         );
@@ -38,14 +38,14 @@ export async function POST(request: Request) {
         return Response.json({
             success: true,
             isAcceptingMessage: updatedUser.isAcceptingMessage,
-            message: "Accept messages status updated successfully"
+            message: "acceptMessages toggled successfully"
         }, { status: 200 });
 
     } catch (error) {
-        console.error("Error toggling message acceptance:", error);
+        console.error("Error toggling acceptMessages:", error);
         return Response.json({
             success: false,
-            message: "Error toggling message acceptance"
+            message: "Error toggling acceptMessages"
         }, { status: 500 });
     }
 }
@@ -77,14 +77,15 @@ export async function GET(request: Request) {
 
         return Response.json({
             success: true,
-            // Ensure this key is consistent for your dashboard state
+            // FIX: Ensure the key returned matches what your Dashboard expects
+            // Your dashboard uses: response.data.isAcceptingMessage
             isAcceptingMessage: foundUser.isAcceptingMessage 
         }, { status: 200 });
     } catch (error) {
-        console.error("Error fetching message acceptance status:", error);
+        console.error("Error in getting message acceptance status", error);
         return Response.json({
             success: false,
-            message: "Error fetching message acceptance status"
+            message: "Error in getting message acceptance status"
         }, { status: 500 });
     }
 }

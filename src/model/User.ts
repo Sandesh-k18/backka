@@ -1,17 +1,22 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose"; //Schema instead of repeated mongoose.Schema, Document = records in db
 
-// 1. Message Interface
-export interface Message extends Document {
-    content: string;
-    createdAt: Date;
+export interface Message extends Document { //interface datatype which is a record in db
+    content: string, //string in ts in small leter, but capital in mongoose
+    createdAt: Date
 }
 
-const MessageSchema: Schema<Message> = new Schema({
-    content: { type: String, required: true },
-    createdAt: { type: Date, required: true, default: Date.now }
-});
+const MessageSchema: Schema<Message> = new Schema({ // schema is of type <Message>
+    content: {
+        type: String, //capital in mongoose
+        required: true
+    },
+    createdAt: {
+        type: Date,
+        required: true,
+        default: Date.now
+    }
+})
 
-// 2. User Interface
 export interface User extends Document {
     username: string;
     email: string;
@@ -20,24 +25,18 @@ export interface User extends Document {
     verifyCodeExpiry: Date;
     isVerified: boolean;
     isAcceptingMessage: boolean;
-    messages: Message[];
-    resetToken?: string;
-    resetTokenExpiry?: Date;
+    messages: Message[] //message is stored along with user credentials
 }
-
-// 3. User Schema
-const UserSchema: Schema<User> = new Schema({
+const UserSchmea: Schema<User> = new Schema({
     username: {
         type: String,
-        required: [true, "Username is required"],
-        unique: true,
-        lowercase: true,
+        requird: [true, "Username required"],
         trim: true,
-        index: true
+        unique: true
     },
     email: {
         type: String,
-        required: [true, "Email is required"], // Fixed typo in your error message
+        required: [true, "Username required"],
         unique: true,
         match: [/.+\@.+\..+/, "Email invalid"]
     },
@@ -62,25 +61,12 @@ const UserSchema: Schema<User> = new Schema({
         type: Boolean,
         default: true,
     },
-    messages: [MessageSchema],
+    messages: [MessageSchema]
 
-    // RESET FIELDS
-    resetToken: {
-        type: String,
-        required: false,
-        // IMPORTANT: 'sparse' allows multiple null/undefined values 
-        // while still keeping the unique constraint for actual tokens
-        unique: true,
-        sparse: true, 
-        index: true 
-    },
-    resetTokenExpiry: {
-        type: Date,
-        required: false
-    }
-});
+})
 
-// 4. Model Export (Fixed typo in UserSchema name)
-const UserModel = (mongoose.models.User as mongoose.Model<User>) || (mongoose.model<User>("User", UserSchema));
+const UserModel = (mongoose.models.User as mongoose.Model<User>) || (mongoose.model<User>("User", UserSchmea))
+
+//is Schema already present || if not create Schema
 
 export default UserModel;

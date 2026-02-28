@@ -25,8 +25,7 @@ import { ApiResponse } from '@/src/types/apiResponse';
 
 export default function SendMessage() {
   const params = useParams<{ username: string }>();
-  const username = params.username.toLowerCase(); 
-
+  const username = params.username;
   const [isLoading, setIsLoading] = useState(false);
   const [suggestedMessages, setSuggestedMessages] = useState<string[]>([
     "What's your favorite movie?",
@@ -34,7 +33,7 @@ export default function SendMessage() {
     "What's your dream job?",
   ]);
   const [isSuggestLoading, setIsSuggestLoading] = useState(false);
-  const [isCooldown, setIsCooldown] = useState(false);
+  const [isCooldown, setIsCooldown] = useState(false); // New: Prevents button spam
 
   const form = useForm<z.infer<typeof messageSchema>>({
     resolver: zodResolver(messageSchema),
@@ -51,7 +50,7 @@ export default function SendMessage() {
     try {
       const response = await axios.post<ApiResponse>('/api/send-message', {
         ...data,
-        username, // This is now guaranteed to be lowercase
+        username,
       });
 
       toast.success(response.data.message);
@@ -86,6 +85,7 @@ export default function SendMessage() {
       setSuggestedMessages(questionsArray);
       toast.success("New suggestions generated!");
 
+      // Start a 5-second cooldown
       setIsCooldown(true);
       setTimeout(() => setIsCooldown(false), 10000);
 
@@ -141,7 +141,7 @@ export default function SendMessage() {
         <div className="space-y-2">
           <Button
             onClick={suggestMessages}
-            disabled={isSuggestLoading || isCooldown}
+            disabled={isSuggestLoading || isCooldown} // Disabled during loading or cooldown
             className="my-4"
             variant="outline"
           >

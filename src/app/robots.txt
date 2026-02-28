@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /dashboard/
-Disallow: /api/
-Disallow: /settings/
-
-Sitemap: https://backka.sandeshkharel.com.np/sitemap.xml
