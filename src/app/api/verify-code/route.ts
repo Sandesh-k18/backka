@@ -5,7 +5,11 @@ export async function POST(request: Request) {
     await dbConnect();
     try {
         const { username, code } = await request.json();
-        const decodedUsername = decodeURIComponent(username);
+        
+        // 1. Decode and normalize to lowercase to match our new implementation
+        const decodedUsername = decodeURIComponent(username).toLowerCase();
+
+        // 2. Query with the normalized username
         const user = await UserModel.findOne({ username: decodedUsername });
 
         if (!user) {
@@ -15,16 +19,20 @@ export async function POST(request: Request) {
             }, { status: 404 });
         }
 
+        // 3. Validation logic
         const isCodeValid = user.verifyCode === code;
         const isCodeNotExpired = new Date(user.verifyCodeExpiry) > new Date();
 
         if (isCodeValid && isCodeNotExpired) {
             user.isVerified = true;
-            await user.save();
+            // user.save() will respect your Schema middleware
+            await user.save(); 
+            
             return Response.json({
                 success: true,
                 message: "Verification successful"
             }, { status: 200 });
+
         } else if (!isCodeNotExpired) {
             return Response.json({
                 success: false,

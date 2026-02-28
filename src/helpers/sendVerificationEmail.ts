@@ -12,9 +12,9 @@ export async function sendVerificationEmail(
 
     try {
         await resend.emails.send({
-            from: "Backka <noreply@backka.sandeshkharel.com.np>",
+            from: "backKA <noreply@backka.sandeshkharel.com.np>",
             to: email, //['delivered@resend.dev']
-            subject: "Backka | Verification code",
+            subject: "backKA | Verification code",
             react: VerificationEmail({ username: username, otp: verifyCode }),
         });
         return {
