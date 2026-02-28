@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/src/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/src/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Link from 'next/link';
@@ -22,7 +22,11 @@ const SignUpPage = () => {
     const [isCheckingUsername, setIsCheckingUsername] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     
-    const debounced = useDebounceCallback(setUsername, 500);
+    // Normalize to lowercase immediately on debounce
+    const debounced = useDebounceCallback((value: string) => {
+        setUsername(value.toLowerCase());
+    }, 500);
+    
     const router = useRouter();
 
     const form = useForm<z.infer<typeof signUpSchema>>({
@@ -40,6 +44,7 @@ const SignUpPage = () => {
                 setIsCheckingUsername(true);
                 setUsernameMessage('');
                 try {
+                    // Querying with the lowercase version
                     const response = await axios.get(`/api/username-unique?username=${username}`);
                     setUsernameMessage(response.data.message);
                 } catch (error) {
@@ -56,9 +61,18 @@ const SignUpPage = () => {
     const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
         setIsSubmitting(true);
         try {
-            const response = await axios.post<ApiResponse>('/api/sign-up', data);
+            // Final normalization before API call
+            const normalizedData = {
+                ...data,
+                username: data.username.toLowerCase(),
+                email: data.email.toLowerCase()
+            };
+
+            const response = await axios.post<ApiResponse>('/api/sign-up', normalizedData);
             toast.success("Account created", { description: response.data.message });
-            router.replace(`/verify/${data.username}`);
+            
+            // Navigate to verify page using lowercase username
+            router.replace(`/verify/${normalizedData.username}`);
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>;
             toast.error("Sign up failed", { description: axiosError.response?.data.message });
@@ -99,7 +113,7 @@ const SignUpPage = () => {
                                     </div>
                                 </div>
                                 {usernameMessage && (
-                                    <p className={`text-[13px] font-medium flex items-center gap-1 ${usernameMessage === "Username is unique" ? "text-green-600" : "text-red-500"}`}>
+                                    <p className={`text-[13px] font-medium flex items-center gap-1 mt-1 ${usernameMessage === "Username is unique" ? "text-green-600" : "text-red-500"}`}>
                                         {usernameMessage}
                                     </p>
                                 )}

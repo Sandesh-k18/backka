@@ -28,6 +28,7 @@ const SignInPage = () => {
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     setIsSubmitting(true);
+
     const result = await signIn("credentials", {
       identifier: data.identifier,
       password: data.password,
@@ -36,9 +37,9 @@ const SignInPage = () => {
 
     if (result?.error) {
       setIsSubmitting(false);
-      if (result.error === 'CredentialsSignin') {
+      if (result.error === 'CredentialsSignin' || result.status === 401) {
         toast.error("Login Failed", {
-          description: "Incorrect username or password",
+          description: "Incorrect email/username or password",
         });
       } else {
         toast.error("Error", {
@@ -48,7 +49,7 @@ const SignInPage = () => {
     }
 
     if (result?.ok) {
-      toast.success(`Welcome ${data.identifier} !`);
+      toast.success(`Welcome ${data.identifier}!`);
       router.replace("/dashboard");
     }
   };
@@ -58,43 +59,59 @@ const SignInPage = () => {
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl border border-slate-200 shadow-xl">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
-            Welcome
+            Welcome Back
           </h1>
           <p className="text-slate-600">Enter your credentials to access your account</p>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            <FormField control={form.control} name="identifier" render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-slate-700">Email or Username</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your email/username"
-                    className="h-11 shadow-sm"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="identifier"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-slate-700">Email or Username</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter your email/username"
+                      className="h-11 shadow-sm"
+                      autoComplete="username"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
 
-            <FormField control={form.control} name="password" render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-slate-700">Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    className="h-11 shadow-sm"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center justify-between">
+                    <FormLabel className="text-slate-700">Password</FormLabel>
+                    <Link 
+                      href="/forgot-password" 
+                      className="text-sm font-semibold text-primary hover:underline underline-offset-4"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      className="h-11 shadow-sm"
+                      autoComplete="current-password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
 
-            <Button type="submit" className="w-full h-11 text-base font-semibold transition-all hover:bg-slate-800" disabled={isSubmitting}>
+            <Button type="submit" className="w-full h-11 text-base font-semibold transition-all" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

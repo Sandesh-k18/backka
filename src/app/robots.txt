@@ -1,0 +1,29 @@
+# ********************************************************
+# backKA Search Engine Instructions
+# ********************************************************
+
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /faq
+Allow: /apis
+Allow: /terms
+Allow: /privacy-policy
+Allow: /u/
+
+# Block private or sensitive utility paths
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /settings
+Disallow: /reset-password
+Disallow: /forgot-password
+
+# Block AI scrapers from crawling user profiles
+User-agent: GPTBot
+Disallow: /u/
+
+User-agent: CCBot
+Disallow: /u/
+
+# Point to your generated sitemap
+Sitemap: https://backka.sandeshkharel.com.np/sitemap.xml
