@@ -17,20 +17,26 @@ const ratelimit = new Ratelimit({
 
 export default async function middleware(request: NextRequest) {
     const url = request.nextUrl;
+    const pathname = url.pathname;
 
-    // 1. HARD BYPASS: Static assets and Auth APIs
+    // 1. HARD BYPASS: Static assets, Auth APIs, and Legal/Public pages
     if (
-        url.pathname.startsWith('/_next') ||
-        url.pathname.includes('/api/auth') ||
-        url.pathname.endsWith('.xml') ||
-        url.pathname.endsWith('.txt') ||
-        url.pathname.endsWith('.webp') ||
-        url.pathname.endsWith('.ico')
+        pathname.startsWith('/_next') ||
+        pathname.includes('/api/auth') ||
+        pathname.endsWith('.xml') ||
+        pathname.endsWith('.txt') ||
+        pathname.endsWith('.webp') ||
+        pathname.endsWith('.ico') ||
+        pathname === '/apis' ||           // Allow public API docs
+        pathname === '/terms' ||          // Allow public Terms
+        pathname === '/privacy-policy' || // Allow public Privacy
+        pathname === '/faq' ||            // Allow public FAQ
+        pathname === '/about'             // Allow public About
     ) {
         return NextResponse.next();
     }
 
-    // 2. Identify user by IP for Ratelimiting
+    // 2. Ratelimiting Logic
     const forwarded = request.headers.get("x-forwarded-for");
     const ip = forwarded ? forwarded.split(",")[0] : "127.0.0.1";
 
@@ -38,7 +44,7 @@ export default async function middleware(request: NextRequest) {
         const { success, limit, reset, remaining } = await ratelimit.limit(ip);
 
         if (!success) {
-            return new NextResponse("Too Many Requests. Please wait a moment.", {
+            return new NextResponse("Too Many Requests. Please wait.", {
                 status: 429,
                 headers: {
                     "X-Ratelimit-Limit": limit.toString(),
@@ -51,29 +57,22 @@ export default async function middleware(request: NextRequest) {
         // 3. AUTHENTICATION LOGIC
         const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
-        // A. THE BYPASS KEY: Check if we are forcing a logout
-        const isForceLogout = url.pathname === "/sign-in" && url.searchParams.get("force") === "true";
+        const isAuthPage =
+            pathname.startsWith("/sign-in") ||
+            pathname.startsWith("/sign-up") ||
+            pathname.startsWith("/verify") ||
+            pathname.startsWith("/forgot-password") ||
+            pathname.startsWith("/reset-password");
 
-        // B. Redirect logic for AUTHENTICATED users
-        if (token) {
-            // If they are logged in, keep them away from auth pages
-            // UNLESS it's our specific force-logout bypass
-            if (!isForceLogout) {
-                if (
-                    url.pathname.startsWith("/sign-in") ||
-                    url.pathname.startsWith("/sign-up") ||
-                    url.pathname.startsWith("/verify") ||
-                    url.pathname.startsWith("/forgot-password") ||
-                    url.pathname.startsWith("/reset-password")
-                ) {
-                    return NextResponse.redirect(new URL("/dashboard", request.url));
-                }
-            }
+        const isForceLogout = pathname === "/sign-in" && url.searchParams.get("force") === "true";
+
+        // A. If Authenticated: Block them from Auth pages
+        if (token && isAuthPage && !isForceLogout) {
+            return NextResponse.redirect(new URL("/dashboard", request.url));
         }
 
-        // C. Redirect logic for UNAUTHENTICATED users
-        // This protects ALL dashboard routes (including /dashboard/settings)
-        if (!token && url.pathname.startsWith("/dashboard")) {
+        // B. If Unauthenticated: Block them from Dashboard/Settings
+        if (!token && (pathname.startsWith("/dashboard") || pathname.startsWith("/settings"))) {
             return NextResponse.redirect(new URL("/sign-in", request.url));
         }
 
@@ -87,6 +86,6 @@ export default async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/((?!api/auth|_next/static|_next/image|backka.webp|og-image.webp|sitemap.xml|robots.txt).*)',
+        '/((?!api/auth|_next/static|_next/image|.*\\.webp$|sitemap\\.xml$|robots\\.txt$).*)',
     ],
 };
