@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Heart, Github, Twitter, ShieldCheck } from 'lucide-react'
+import { Heart, Github, ShieldCheck } from 'lucide-react'
 
 export const Footer = () => {
   return (
@@ -19,7 +19,7 @@ export const Footer = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <span className="text-2xl font-black tracking-tighter text-white">
-                backKA
+                back<span className="text-indigo-500">KA</span>
               </span>
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20">
                 <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse" />
@@ -32,9 +32,6 @@ export const Footer = () => {
             <div className="flex gap-4">
               <Link href="https://github.com/sandesh-k18" className="text-slate-500 hover:text-white transition-colors">
                 <Github className="w-5 h-5" />
-              </Link>
-              <Link href="#" className="text-slate-500 hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
               </Link>
             </div>
           </div>
@@ -66,12 +63,12 @@ export const Footer = () => {
         {/* Bottom Credits */}
         <div className="mt-16 pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
-            © {new Date().getFullYear()} True Whisper. All rights reserved.
+            © {new Date().getFullYear()} backKA. All rights reserved.
           </p>
           <div className="flex items-center gap-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
             Developed with 
             <Heart className="h-3 w-3 text-rose-500 fill-rose-500" /> 
-            by <span className="text-slate-200">Not Anonymous</span>
+            by <span className="text-slate-200 uppercase">Sandesh Kharel</span>
           </div>
         </div>
       </div>
