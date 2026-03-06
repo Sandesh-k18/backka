@@ -22,7 +22,9 @@ const SignUpPage = () => {
     const [isCheckingUsername, setIsCheckingUsername] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     
-    // Normalize to lowercase immediately on debounce
+    // 1. Consistency check: This string must match your API response exactly
+    const SUCCESS_MESSAGE = "Username is available";
+    
     const debounced = useDebounceCallback((value: string) => {
         setUsername(value.toLowerCase());
     }, 500);
@@ -44,7 +46,6 @@ const SignUpPage = () => {
                 setIsCheckingUsername(true);
                 setUsernameMessage('');
                 try {
-                    // Querying with the lowercase version
                     const response = await axios.get(`/api/username-unique?username=${username}`);
                     setUsernameMessage(response.data.message);
                 } catch (error) {
@@ -61,7 +62,6 @@ const SignUpPage = () => {
     const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
         setIsSubmitting(true);
         try {
-            // Final normalization before API call
             const normalizedData = {
                 ...data,
                 username: data.username.toLowerCase(),
@@ -71,7 +71,6 @@ const SignUpPage = () => {
             const response = await axios.post<ApiResponse>('/api/sign-up', normalizedData);
             toast.success("Account created", { description: response.data.message });
             
-            // Navigate to verify page using lowercase username
             router.replace(`/verify/${normalizedData.username}`);
         } catch (error) {
             const axiosError = error as AxiosError<ApiResponse>;
@@ -108,12 +107,13 @@ const SignUpPage = () => {
                                     </FormControl>
                                     <div className="absolute right-3 top-3">
                                         {isCheckingUsername && <Loader2 className="animate-spin h-5 w-5 text-slate-400" />}
-                                        {!isCheckingUsername && usernameMessage === "Username is unique" && <CheckCircle2 className="h-5 w-5 text-green-500" />}
-                                        {!isCheckingUsername && usernameMessage && usernameMessage !== "Username is unique" && <AlertCircle className="h-5 w-5 text-red-500" />}
+                                        {/* Updated icons to match "available" status */}
+                                        {!isCheckingUsername && usernameMessage === SUCCESS_MESSAGE && <CheckCircle2 className="h-5 w-5 text-green-500" />}
+                                        {!isCheckingUsername && usernameMessage && usernameMessage !== SUCCESS_MESSAGE && <AlertCircle className="h-5 w-5 text-red-500" />}
                                     </div>
                                 </div>
                                 {usernameMessage && (
-                                    <p className={`text-[13px] font-medium flex items-center gap-1 mt-1 ${usernameMessage === "Username is unique" ? "text-green-600" : "text-red-500"}`}>
+                                    <p className={`text-[13px] font-medium flex items-center gap-1 mt-1 ${usernameMessage === SUCCESS_MESSAGE ? "text-green-600" : "text-red-500"}`}>
                                         {usernameMessage}
                                     </p>
                                 )}
@@ -144,7 +144,8 @@ const SignUpPage = () => {
                         <Button 
                             type="submit" 
                             className="w-full h-11 text-base font-semibold shadow-sm" 
-                            disabled={isSubmitting || isCheckingUsername || (usernameMessage !== "" && usernameMessage !== "Username is unique")}
+                            /* Updated disabled logic to allow "Username is available" */
+                            disabled={isSubmitting || isCheckingUsername || (usernameMessage !== "" && usernameMessage !== SUCCESS_MESSAGE)}
                         >
                             {isSubmitting ? (
                                 <>
