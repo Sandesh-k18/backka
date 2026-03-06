@@ -80,7 +80,7 @@ export default function PrivacyPolicy() {
                             <h3 className="text-xl font-bold mb-1">Privacy Concerns?</h3>
                             <p className="text-slate-400 text-sm font-medium">Our legal and security team is here to help.</p>
                         </div>
-                        <Link href="mailto:support@backka.sandeshkharel.com.np">
+                        <Link href="/faq">
                             <button className="bg-white text-slate-950 px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-colors">
                                 Contact Security
                             </button>
