@@ -1,65 +1,14 @@
-import { Code2, Cpu, Globe, Key, Lock, Zap, ArrowLeft, Trash2, MessageSquare, UserCheck, RefreshCw, Mail } from 'lucide-react';
+import { Code2, Cpu, Globe, Key, Lock, Zap, ArrowLeft, Trash2, MessageSquare, UserCheck, RefreshCw, Mail, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
 export default function APIDocumentation() {
+    // Endpoints sorted alphabetically by path (starting with /api/accept-messages)
     const endpoints = [
-        // Messaging Endpoints
-        {
-            method: "POST",
-            path: "/api/send-message",
-            desc: "Deliver an anonymous whisper to a specific user profile.",
-            icon: Zap,
-            color: "text-amber-500"
-        },
         {
             method: "POST",
             path: "/api/accept-messages",
             desc: "Toggle whether your profile is currently accepting new whispers.",
             icon: MessageSquare,
-            color: "text-indigo-600"
-        },
-        {
-            method: "GET",
-            path: "/api/get-messages",
-            desc: "Retrieve the list of whispers received by the authenticated user.",
-            icon: Mail,
-            color: "text-indigo-600"
-        },
-        {
-            method: "GET",
-            path: "/api/suggest-messages",
-            desc: "Fetch AI-generated conversation starters for anonymous prompts.",
-            icon: Cpu,
-            color: "text-purple-500"
-        },
-        {
-            method: "DELETE",
-            path: "/api/delete-message",
-            desc: "Permanently remove a specific whisper from your inbox.",
-            icon: Trash2,
-            color: "text-rose-500"
-        },
-        {
-            method: "DELETE",
-            path: "/api/delete-all-messages",
-            desc: "Wipe your entire whisper history. This action is irreversible.",
-            icon: Trash2,
-            color: "text-rose-500"
-        },
-
-        // Security & Auth Endpoints
-        {
-            method: "GET",
-            path: "/api/verify-code",
-            desc: "Verify the OTP or magic link code sent for authentication.",
-            icon: UserCheck,
-            color: "text-emerald-500"
-        },
-        {
-            method: "GET",
-            path: "/api/username-unique",
-            desc: "Check real-time availability of a username during registration.",
-            icon: Globe,
             color: "text-indigo-600"
         },
         {
@@ -84,18 +33,67 @@ export default function APIDocumentation() {
             color: "text-slate-600"
         },
         {
+            method: "DELETE",
+            path: "/api/delete-all-messages",
+            desc: "Wipe your entire whisper history. This action is irreversible.",
+            icon: Trash2,
+            color: "text-rose-500"
+        },
+        {
+            method: "DELETE",
+            path: "/api/delete-message",
+            desc: "Permanently remove a specific whisper from your inbox.",
+            icon: Trash2,
+            color: "text-rose-500"
+        },
+        {
+            method: "GET",
+            path: "/api/get-messages",
+            desc: "Retrieve the list of whispers received by the authenticated user.",
+            icon: Mail,
+            color: "text-indigo-600"
+        },
+        {
+            method: "POST",
+            path: "/api/send-message",
+            desc: "Deliver an anonymous whisper to a specific user profile.",
+            icon: Zap,
+            color: "text-amber-500"
+        },
+        {
             method: "POST",
             path: "/api/sign-up",
             desc: "Initialize a new user account on the backKA protocol.",
             icon: Key,
             color: "text-indigo-600"
+        },
+        {
+            method: "GET",
+            path: "/api/suggest-messages",
+            desc: "Fetch AI-generated conversation starters for anonymous prompts.",
+            icon: Cpu,
+            color: "text-purple-500"
+        },
+        {
+            method: "GET",
+            path: "/api/username-unique",
+            desc: "Check real-time availability of a username during registration.",
+            icon: Globe,
+            color: "text-indigo-600"
+        },
+        {
+            method: "GET",
+            path: "/api/verify-code",
+            desc: "Verify the OTP or magic link code sent for authentication.",
+            icon: UserCheck,
+            color: "text-emerald-500"
         }
     ];
 
     return (
         <div className="min-h-screen bg-white pt-24 pb-16 selection:bg-indigo-100">
             <div className="container mx-auto px-6 max-w-4xl">
-                
+
                 {/* Header Section */}
                 <div className="text-center mb-16">
                     <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-600 transition-colors mb-8 text-xs font-bold uppercase tracking-widest">
@@ -109,7 +107,7 @@ export default function APIDocumentation() {
                     </p>
                 </div>
 
-                {/* API Key Card */}
+                {/* Auth Key Card */}
                 <div className="mb-12 p-8 rounded-[2.5rem] bg-slate-950 text-white relative overflow-hidden shadow-2xl">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/20 rounded-full blur-[80px]" />
                     <div className="relative z-10">
@@ -120,11 +118,11 @@ export default function APIDocumentation() {
                             <h3 className="text-lg font-bold">Authentication</h3>
                         </div>
                         <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-md">
-                            All requests must include a Bearer Token. 
-                            Manage your keys in <Link href="/settings" className="text-white underline underline-offset-4">Settings</Link>.
+                            All requests must be authenticated using a session token.
+                            You can manage your account security in the <Link href="/dashboard/settings" className="text-white underline underline-offset-4 font-bold">Dashboard Settings</Link>.
                         </p>
                         <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 font-mono text-xs text-indigo-300">
-                            Authorization: Bearer YOUR_SECRET_TOKEN
+                            Authorization: Bearer [your_session_token]
                         </div>
                     </div>
                 </div>
@@ -141,11 +139,10 @@ export default function APIDocumentation() {
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-3 mb-1">
-                                            <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider ${
-                                                api.method === 'POST' ? 'bg-amber-100 text-amber-700' : 
-                                                api.method === 'DELETE' ? 'bg-rose-100 text-rose-700' : 
-                                                'bg-indigo-100 text-indigo-700'
-                                            }`}>
+                                            <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider ${api.method === 'POST' ? 'bg-amber-100 text-amber-700' :
+                                                api.method === 'DELETE' ? 'bg-rose-100 text-rose-700' :
+                                                    'bg-indigo-100 text-indigo-700'
+                                                }`}>
                                                 {api.method}
                                             </span>
                                             <code className="text-sm font-bold text-slate-900">{api.path}</code>

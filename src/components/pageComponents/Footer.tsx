@@ -14,7 +14,7 @@ export const Footer = () => {
 
       <div className="container mx-auto px-6 max-w-6xl relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-          
+
           {/* Brand & Mission */}
           <div className="space-y-6">
             <div className="flex items-center gap-3">
@@ -51,6 +51,7 @@ export const Footer = () => {
               <nav className="flex flex-col gap-3 text-sm font-semibold text-slate-300">
                 <Link href="/privacy-policy" className="hover:text-indigo-400 transition-colors">Privacy Policy</Link>
                 <Link href="/terms" className="hover:text-indigo-400 transition-colors">Terms of Service</Link>
+                <Link href="/apis" className="hover:text-indigo-400 transition-colors">APIs</Link>
                 <div className="flex items-center gap-2 text-emerald-500/80 pt-1">
                   <ShieldCheck className="w-4 h-4" />
                   <span className="text-[11px] font-bold uppercase tracking-tighter">GDPR Ready</span>
@@ -66,9 +67,9 @@ export const Footer = () => {
             © {new Date().getFullYear()} backKA. All rights reserved.
           </p>
           <div className="flex items-center gap-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
-            Developed with 
-            <Heart className="h-3 w-3 text-rose-500 fill-rose-500" /> 
-            by <span className="text-slate-200 uppercase">Sandesh Kharel</span>
+            Developed with
+            <Heart className="h-3 w-3 text-rose-500 fill-rose-500" />
+            by <span className="text-slate-200 uppercase">Not Anonymous</span>
           </div>
         </div>
       </div>

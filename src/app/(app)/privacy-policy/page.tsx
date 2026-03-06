@@ -11,7 +11,7 @@ export default function PrivacyPolicy() {
         {
             icon: Lock,
             title: "Encryption Standards",
-            content: "All data is encrypted using AES-256 at rest and TLS 1.2+ in transit. Your messages are stored in secure MongoDB Atlas clusters with strict access control lists."
+            content: "We use AES-256 encryption and TLS 1.2+ to ensure your data is safe from external threats. Your account is protected by industry-standard password hashing."
         },
         {
             icon: Database,
@@ -28,7 +28,7 @@ export default function PrivacyPolicy() {
     return (
         <div className="min-h-screen bg-white pt-24 pb-16 selection:bg-indigo-100">
             <div className="container mx-auto px-6 max-w-4xl">
-                
+
                 {/* Header */}
                 <div className="text-center mb-16">
                     <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-600 transition-colors mb-8 text-xs font-bold uppercase tracking-widest">
@@ -64,7 +64,7 @@ export default function PrivacyPolicy() {
                 {/* Additional Details */}
                 <div className="mt-12 p-8 rounded-[2rem] border border-dashed border-slate-200">
                     <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <Globe className="w-4 h-4 text-indigo-600" /> 
+                        <Globe className="w-4 h-4 text-indigo-600" />
                         International Compliance
                     </h4>
                     <p className="text-sm text-slate-500 leading-relaxed font-medium">
@@ -80,7 +80,7 @@ export default function PrivacyPolicy() {
                             <h3 className="text-xl font-bold mb-1">Privacy Concerns?</h3>
                             <p className="text-slate-400 text-sm font-medium">Our legal and security team is here to help.</p>
                         </div>
-                        <Link href="mailto:security@backka.com">
+                        <Link href="mailto:support@backka.sandeshkharel.com.np">
                             <button className="bg-white text-slate-950 px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-colors">
                                 Contact Security
                             </button>
